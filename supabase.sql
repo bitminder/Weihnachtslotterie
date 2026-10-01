@@ -1,5 +1,3 @@
-create extension if not exists pgcrypto;
-
 create table if not exists public.lottery_assignments (
   giver text primary key,
   recipient text not null unique,
@@ -15,7 +13,7 @@ create function public.lottery_status()
 returns table(name text, has_drawn boolean)
 language sql
 security definer
-set search_path = public
+set search_path = ''
 as $$
   select n.name, coalesce(a.has_drawn,false)
   from unnest(array['Alexander','Nicolina','Anna','Jan','Iwona','Dariusz','Magda','Livan']::text[]) with ordinality as n(name, ord)
@@ -28,7 +26,7 @@ create function public.draw_lottery(p_giver text)
 returns text
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 declare
   people text[] := array['Alexander','Nicolina','Anna','Jan','Iwona','Dariusz','Magda','Livan'];
@@ -37,31 +35,59 @@ declare
   tries int := 0;
   result text;
 begin
-  if not (p_giver = any(people)) then raise exception 'Unbekannter Teilnehmer'; end if;
-  perform pg_advisory_xact_lock(20261224);
+  if not (p_giver = any(people)) then
+    raise exception 'Unbekannter Teilnehmer';
+  end if;
+
+  perform pg_catalog.pg_advisory_xact_lock(20261224);
 
   if not exists(select 1 from public.lottery_assignments) then
     loop
       tries := tries + 1;
-      select array_agg(x order by random()) into shuffled from unnest(people) x;
+      select pg_catalog.array_agg(x order by pg_catalog.random())
+      into shuffled
+      from pg_catalog.unnest(people) x;
+
       exit when not exists (
-        select 1 from generate_subscripts(people,1) s where people[s]=shuffled[s]
+        select 1
+        from pg_catalog.generate_subscripts(people,1) s
+        where people[s]=shuffled[s]
       );
-      if tries > 1000 then raise exception 'Keine gültige Ziehung erzeugt'; end if;
+
+      if tries > 1000 then
+        raise exception 'Keine gültige Ziehung erzeugt';
+      end if;
     end loop;
-    for i in 1..array_length(people,1) loop
-      insert into public.lottery_assignments(giver,recipient,has_drawn) values(people[i],shuffled[i],false);
+
+    for i in 1..pg_catalog.array_length(people,1) loop
+      insert into public.lottery_assignments(giver,recipient,has_drawn)
+      values(people[i],shuffled[i],false);
     end loop;
   end if;
 
-  select recipient into result from public.lottery_assignments where giver=p_giver for update;
-  if exists(select 1 from public.lottery_assignments where giver=p_giver and has_drawn) then
+  select recipient
+  into result
+  from public.lottery_assignments
+  where giver=p_giver
+  for update;
+
+  if exists(
+    select 1
+    from public.lottery_assignments
+    where giver=p_giver and has_drawn
+  ) then
     raise exception 'Für diese Person wurde bereits gezogen';
   end if;
-  update public.lottery_assignments set has_drawn=true, drawn_at=now() where giver=p_giver;
+
+  update public.lottery_assignments
+  set has_drawn=true, drawn_at=pg_catalog.now()
+  where giver=p_giver;
+
   return result;
 end;
 $$;
 
-grant execute on function public.lottery_status() to anon, authenticated;
-grant execute on function public.draw_lottery(text) to anon, authenticated;
+revoke execute on function public.lottery_status() from public, authenticated;
+revoke execute on function public.draw_lottery(text) from public, authenticated;
+grant execute on function public.lottery_status() to anon;
+grant execute on function public.draw_lottery(text) to anon;
