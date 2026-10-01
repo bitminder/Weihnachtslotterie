@@ -1,5 +1,5 @@
 const NAMES = ["Alexander","Nicolina","Anna","Jan","Iwona","Dariusz","Magda","Livan"];
-const DEVICE_LOCK_KEY = "weihnachtslotterie-2026-device-drawn";
+const DEVICE_LOCK_KEY = "weihnachtslotterie-2026-device-drawn-v2";
 const el = id => document.getElementById(id);
 let state = {
   selected: null,
