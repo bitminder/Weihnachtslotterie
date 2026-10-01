@@ -1,5 +1,5 @@
-const SUPABASE_URL = "https://DEIN-PROJEKT.supabase.co";
-const SUPABASE_ANON_KEY = "DEIN_ANON_KEY";
+const SUPABASE_URL = "https://kwsatixuftemxlhluzjc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1xUoMevCXVbJeF5S3Q2D_w_ouZ2eJRJ";
 
 const NAMES = ["Alexander","Nicolina","Anna","Jan","Iwona","Dariusz","Magda","Livan"];
 const configured = !SUPABASE_URL.includes("DEIN-PROJEKT") && !SUPABASE_ANON_KEY.includes("DEIN_ANON_KEY");
