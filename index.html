@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d2b22" />
+  <title>Weihnachtslotterie 2026</title>
+  <meta name="description" content="Die Familien-Weihnachtslotterie 2026 – zieh dein Los und finde heraus, wen du beschenkst." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="snow" aria-hidden="true"></div>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="eyebrow">Familien-Weihnachtslotterie</div>
+      <h1>Wer beschenkt wen<br><span>zu Weihnachten 2026?</span></h1>
+      <p class="hero-copy">Wähle deinen Namen, zieh genau ein Los und halte dein Ergebnis geheim.</p>
+      <div class="stats" aria-label="Status der Ziehung">
+        <div class="stat-card"><span class="stat-value" id="remainingCount">8</span><span class="stat-label">Lose im Topf</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat-card"><span class="stat-value" id="drawnCount">0</span><span class="stat-label">bereits gezogen</span></div>
+      </div>
+    </section>
+
+    <section class="lottery-card" id="lotteryCard">
+      <div class="step-head">
+        <div><span class="step-label">Schritt 1</span><h2>Wer bist du?</h2></div>
+        <div class="pot-icon" aria-hidden="true">🎄</div>
+      </div>
+      <div class="participants" id="participants" aria-live="polite"></div>
+      <div class="selection-panel" id="selectionPanel" hidden>
+        <div class="selected-copy"><span>Ausgewählt</span><strong id="selectedName">—</strong></div>
+        <button class="draw-button" id="drawButton" type="button"><span class="button-icon">🎟️</span>Los ziehen</button>
+        <p class="privacy-note">Dein Ergebnis wird nur auf diesem Bildschirm angezeigt.</p>
+      </div>
+    </section>
+
+    <section class="result-card" id="resultCard" hidden aria-live="assertive">
+      <div class="sparkle">✦</div>
+      <p class="result-kicker">Der Weihnachtsmann hat entschieden …</p>
+      <h2>Du beschenkst dieses Jahr</h2>
+      <div class="recipient-name" id="recipientName">—</div>
+      <p class="result-secret">🤫 Pssst … nicht verraten!</p>
+      <button class="close-result" id="closeResult" type="button">Ergebnis schließen</button>
+    </section>
+
+    <section class="status-card">
+      <div class="status-head">
+        <div><span class="step-label">Live-Status</span><h2>Wer hat schon gezogen?</h2></div>
+        <button class="icon-button" id="refreshButton" type="button" title="Status aktualisieren" aria-label="Status aktualisieren">↻</button>
+      </div>
+      <div class="status-list" id="statusList"></div>
+      <p class="status-note">Die Zuordnungen selbst bleiben geheim.</p>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
