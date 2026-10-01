@@ -1,10 +1,11 @@
 const NAMES = ["Alexander","Nicolina","Anna","Jan","Iwona","Dariusz","Magda","Livan"];
-const DEVICE_LOCK_KEY = "weihnachtslotterie-2026-device-drawn-v2";
+const DEVICE_LOCK_KEY = "weihnachtslotterie-2026-device-round";
 const el = id => document.getElementById(id);
 let state = {
   selected: null,
   drawnCount: 0,
-  deviceLocked: localStorage.getItem(DEVICE_LOCK_KEY) === "1"
+  roundVersion: null,
+  deviceLocked: false
 };
 let db = null;
 
@@ -45,6 +46,14 @@ async function initClient(){
   db = window.supabase.createClient(url, key);
 }
 
+function syncDeviceLock(){
+  const storedRound = Number(localStorage.getItem(DEVICE_LOCK_KEY));
+  state.deviceLocked = Number.isInteger(storedRound) && storedRound === state.roundVersion;
+  if(storedRound && storedRound !== state.roundVersion){
+    localStorage.removeItem(DEVICE_LOCK_KEY);
+  }
+}
+
 async function refreshCount(){
   const { data, error } = await db.rpc("lottery_status");
   if(error){
@@ -52,7 +61,10 @@ async function refreshCount(){
     toast("Status konnte nicht geladen werden.");
     return;
   }
+
   state.drawnCount = Number(data?.[0]?.drawn_count ?? 0);
+  state.roundVersion = Number(data?.[0]?.round_version ?? 1);
+  syncDeviceLock();
   render();
 }
 
@@ -78,7 +90,7 @@ async function draw(){
     return;
   }
 
-  localStorage.setItem(DEVICE_LOCK_KEY, "1");
+  localStorage.setItem(DEVICE_LOCK_KEY, String(state.roundVersion));
   state.deviceLocked = true;
 
   el("recipientName").textContent = data;
