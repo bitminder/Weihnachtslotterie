@@ -1,6 +1,11 @@
 const NAMES = ["Alexander","Nicolina","Anna","Jan","Iwona","Dariusz","Magda","Livan"];
+const DEVICE_LOCK_KEY = "weihnachtslotterie-2026-device-drawn";
 const el = id => document.getElementById(id);
-let state = { selected: null, drawnCount: 0 };
+let state = {
+  selected: null,
+  drawnCount: 0,
+  deviceLocked: localStorage.getItem(DEVICE_LOCK_KEY) === "1"
+};
 let db = null;
 
 function toast(message){
@@ -12,17 +17,22 @@ function toast(message){
 
 function render(){
   el("participants").innerHTML = "";
+
   NAMES.forEach(name => {
     const button = document.createElement("button");
     button.className = "participant" + (state.selected === name ? " selected" : "");
     button.textContent = name;
+    button.disabled = state.deviceLocked;
     button.onclick = () => {
+      if(state.deviceLocked) return;
       state.selected = name;
       render();
     };
     el("participants").appendChild(button);
   });
-  el("selectionPanel").hidden = !state.selected;
+
+  el("selectionPanel").hidden = !state.selected || state.deviceLocked;
+  el("lockedPanel").hidden = !state.deviceLocked;
   el("selectedName").textContent = state.selected || "—";
   el("drawnCount").textContent = state.drawnCount;
 }
@@ -47,7 +57,8 @@ async function refreshCount(){
 }
 
 async function draw(){
-  if(!state.selected || !db) return;
+  if(!state.selected || !db || state.deviceLocked) return;
+
   const button = el("drawButton");
   button.disabled = true;
   button.innerHTML = "✨ Los wird gezogen …";
@@ -67,14 +78,19 @@ async function draw(){
     return;
   }
 
+  localStorage.setItem(DEVICE_LOCK_KEY, "1");
+  state.deviceLocked = true;
+
   el("recipientName").textContent = data;
   el("lotteryCard").hidden = true;
   el("resultCard").hidden = false;
+
   await refreshCount();
   window.scrollTo({ top: el("resultCard").offsetTop - 20, behavior: "smooth" });
 }
 
 el("drawButton").addEventListener("click", draw);
+
 el("closeResult").addEventListener("click", () => {
   el("resultCard").hidden = true;
   el("lotteryCard").hidden = false;
