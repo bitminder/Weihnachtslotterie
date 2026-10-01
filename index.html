@@ -36,6 +36,11 @@
         <button class="draw-button" id="drawButton" type="button"><span class="button-icon">🎟️</span>Los ziehen</button>
         <p class="privacy-note">Jede Person kann serverseitig nur ein einziges Mal ziehen.</p>
       </div>
+          <div class="locked-panel" id="lockedPanel" hidden>
+        <div class="locked-icon">🔒</div>
+        <h2>Du hast bereits gezogen</h2>
+        <p>Auf diesem Gerät ist keine weitere Ziehung möglich.</p>
+      </div>
     </section>
 
     <section class="result-card" id="resultCard" hidden aria-live="assertive">
@@ -51,6 +56,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./simple.js?v=3"></script>
+  <script src="./simple.js?v=4"></script>
 </body>
 </html>
